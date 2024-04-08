@@ -21,7 +21,7 @@ use HomeNet\RouterosApi\RouterAPI;
 
 $routerApi = RouterAPI::make('host', 'username', 'password');
 
-$routerApi->comm('/interfaces/print');
+$routerApi->comm('/interface/print');
 ```
 
 ## Testing
