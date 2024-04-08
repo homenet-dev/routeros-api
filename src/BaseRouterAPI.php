@@ -5,14 +5,23 @@ namespace HomeNet\RouterosApi;
 class BaseRouterAPI
 {
     public $debug = false; //  Show debug information
+
     public $connected = false; //  Connection state
+
     public $port = 8728;  //  Port to connect to (default 8729 for ssl)
+
     public $ssl = false; //  Connect using SSL (must enable api-ssl in IP/Services)
+
     public $timeout = 1;     //  Connection attempt timeout and data read timeout
+
     public $attempts = 1;     //  Connection attempt count
+
     public $delay = 0.1;     //  Delay between connection attempts in seconds
+
     public $socket;            //  Variable for storing socket resource
+
     public $error_no;          //  Variable for storing connection error number, if any
+
     public $error_str;         //  Variable for storing connection error text, if any
 
     // Check, can be var used in foreach
@@ -29,18 +38,18 @@ class BaseRouterAPI
     /**
      * Print text for debug purposes
      *
-     * @param  string $text Text to print
+     * @param  string  $text  Text to print
      * @return void
      */
     public function debug($text)
     {
         if ($this->debug) {
-            echo $text . "\n";
+            echo $text."\n";
         }
     }
 
     /**
-     * @param  string $length
+     * @param  string  $length
      * @return void
      */
     public function encodeLength($length)
@@ -49,15 +58,15 @@ class BaseRouterAPI
             $length = chr($length);
         } elseif ($length < 0x4000) {
             $length |= 0x8000;
-            $length = chr(($length >> 8) & 0xFF) . chr($length & 0xFF);
+            $length = chr(($length >> 8) & 0xFF).chr($length & 0xFF);
         } elseif ($length < 0x200000) {
             $length |= 0xC00000;
-            $length = chr(($length >> 16) & 0xFF) . chr(($length >> 8) & 0xFF) . chr($length & 0xFF);
+            $length = chr(($length >> 16) & 0xFF).chr(($length >> 8) & 0xFF).chr($length & 0xFF);
         } elseif ($length < 0x10000000) {
             $length |= 0xE0000000;
-            $length = chr(($length >> 24) & 0xFF) . chr(($length >> 16) & 0xFF) . chr(($length >> 8) & 0xFF) . chr($length & 0xFF);
+            $length = chr(($length >> 24) & 0xFF).chr(($length >> 16) & 0xFF).chr(($length >> 8) & 0xFF).chr($length & 0xFF);
         } elseif ($length >= 0x10000000) {
-            $length = chr(0xF0) . chr(($length >> 24) & 0xFF) . chr(($length >> 16) & 0xFF) . chr(($length >> 8) & 0xFF) . chr($length & 0xFF);
+            $length = chr(0xF0).chr(($length >> 24) & 0xFF).chr(($length >> 16) & 0xFF).chr(($length >> 8) & 0xFF).chr($length & 0xFF);
         }
 
         return $length;
@@ -66,10 +75,10 @@ class BaseRouterAPI
     /**
      * Login to RouterOS
      *
-     * @param  string $ip       Hostname (IP or domain) of the RouterOS server
-     * @param  string $login    The RouterOS username
-     * @param  string $password The RouterOS password
-     * @return bool   If we are connected or not
+     * @param  string  $ip  Hostname (IP or domain) of the RouterOS server
+     * @param  string  $login  The RouterOS username
+     * @param  string  $password  The RouterOS password
+     * @return bool If we are connected or not
      */
     // public function connect($ip, $login, $password)
     // {
@@ -136,8 +145,8 @@ class BaseRouterAPI
             $this->connected = false;
             $PROTOCOL = ($this->ssl ? 'ssl://' : '');
             $context = stream_context_create(['ssl' => ['ciphers' => 'ADH:ALL', 'verify_peer' => false, 'verify_peer_name' => false]]);
-            $this->debug('Connection attempt #' . $ATTEMPT . ' to ' . $PROTOCOL . $ip . ':' . $this->port . '...');
-            $this->socket = @stream_socket_client($PROTOCOL . $ip . ':' . $this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT, $context);
+            $this->debug('Connection attempt #'.$ATTEMPT.' to '.$PROTOCOL.$ip.':'.$this->port.'...');
+            $this->socket = @stream_socket_client($PROTOCOL.$ip.':'.$this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT, $context);
             if ($this->socket) {
                 stream_set_timeout($this->socket, $this->timeout);
                 $this->write('/login');
@@ -147,8 +156,8 @@ class BaseRouterAPI
                     if (preg_match_all('/[^=]+/i', $RESPONSE[1], $MATCHES)) {
                         if ($MATCHES[0][0] == 'ret' && strlen($MATCHES[0][1]) == 32) {
                             $this->write('/login', false);
-                            $this->write('=name=' . $login, false);
-                            $this->write('=response=00' . md5(chr(0) . $password . pack('H*', $MATCHES[0][1])));
+                            $this->write('=name='.$login, false);
+                            $this->write('=response=00'.md5(chr(0).$password.pack('H*', $MATCHES[0][1])));
                             $RESPONSE = $this->read(false);
                             if (isset($RESPONSE[0]) && $RESPONSE[0] == '!done') {
                                 $this->connected = true;
@@ -180,8 +189,8 @@ class BaseRouterAPI
             $this->connected = false;
             $PROTOCOL = ($this->ssl ? 'ssl://' : '');
             $context = stream_context_create(['ssl' => ['ciphers' => 'ADH:ALL', 'verify_peer' => false, 'verify_peer_name' => false]]);
-            $this->debug('Connection attempt #' . $ATTEMPT . ' to ' . $PROTOCOL . $ip . ':' . $this->port . '...');
-            $this->socket = @stream_socket_client($PROTOCOL . $ip . ':' . $this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT, $context);
+            $this->debug('Connection attempt #'.$ATTEMPT.' to '.$PROTOCOL.$ip.':'.$this->port.'...');
+            $this->socket = @stream_socket_client($PROTOCOL.$ip.':'.$this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT, $context);
             if ($this->socket) {
                 stream_set_timeout($this->socket, $this->timeout);
                 $this->write('/login');
@@ -191,8 +200,8 @@ class BaseRouterAPI
                     if (preg_match_all('/[^=]+/i', $RESPONSE[1], $MATCHES)) {
                         if ($MATCHES[0][0] == 'ret' && strlen($MATCHES[0][1]) == 32) {
                             $this->write('/login', false);
-                            $this->write('=name=' . $login, false);
-                            $this->write('=password=' . $password);
+                            $this->write('=name='.$login, false);
+                            $this->write('=password='.$password);
                             $RESPONSE = $this->read(false);
                             if (isset($RESPONSE[0]) && $RESPONSE[0] == '!done') {
                                 $this->connected = true;
@@ -235,7 +244,7 @@ class BaseRouterAPI
     /**
      * Parse response from Router OS
      *
-     * @param  array $response Response data
+     * @param  array  $response  Response data
      * @return array Array with parsed data
      */
     public function parseResponse($response)
@@ -275,7 +284,7 @@ class BaseRouterAPI
     /**
      * Parse response from Router OS
      *
-     * @param  array $response Response data
+     * @param  array  $response  Response data
      * @return array Array with parsed data
      */
     public function parseResponse4Smarty($response)
@@ -317,7 +326,7 @@ class BaseRouterAPI
     /**
      * Change "-" and "/" from array key to "_"
      *
-     * @param  array $array Input array
+     * @param  array  $array  Input array
      * @return array Array with changed key names
      */
     public function arrayChangeKeyName(&$array)
@@ -342,7 +351,7 @@ class BaseRouterAPI
     /**
      * Read data from Router OS
      *
-     * @param  bool  $parse Parse the data? default: true
+     * @param  bool  $parse  Parse the data? default: true
      * @return array Array with parsed or unparsed data
      */
     public function read($parse = true)
@@ -395,7 +404,7 @@ class BaseRouterAPI
                     $retlen = strlen($_);
                 }
                 $RESPONSE[] = $_;
-                $this->debug('>>> [' . $retlen . '/' . $LENGTH . '] bytes read.');
+                $this->debug('>>> ['.$retlen.'/'.$LENGTH.'] bytes read.');
             }
 
             // If we get a !done, make a note of it.
@@ -405,7 +414,7 @@ class BaseRouterAPI
 
             $STATUS = stream_get_meta_data($this->socket);
             if ($LENGTH > 0) {
-                $this->debug('>>> [' . $LENGTH . ', ' . $STATUS['unread_bytes'] . ']' . $_);
+                $this->debug('>>> ['.$LENGTH.', '.$STATUS['unread_bytes'].']'.$_);
             }
 
             if ((! $this->connected && ! $STATUS['unread_bytes']) || ($this->connected && ! $STATUS['unread_bytes'] && $receiveddone)) {
@@ -423,12 +432,12 @@ class BaseRouterAPI
     /**
      * Write (send) data to Router OS
      *
-     * @param  string $command A string with the command to send
+     * @param  string  $command  A string with the command to send
      * @param  mixed  $param2  If we set an integer, the command will send this data as a "tag"
      *                         If we set it to boolean true, the funcion will send the comand and finish
      *                         If we set it to boolean false, the funcion will send the comand and wait for next command
      *                         Default: true
-     * @return bool   Return false if no command especified
+     * @return bool Return false if no command especified
      */
     public function write($command, $param2 = true)
     {
@@ -436,13 +445,13 @@ class BaseRouterAPI
             $data = explode("\n", $command);
             foreach ($data as $com) {
                 $com = trim($com);
-                fwrite($this->socket, $this->encodeLength(strlen($com)) . $com);
-                $this->debug('<<< [' . strlen($com) . '] ' . $com);
+                fwrite($this->socket, $this->encodeLength(strlen($com)).$com);
+                $this->debug('<<< ['.strlen($com).'] '.$com);
             }
 
             if (gettype($param2) == 'integer') {
-                fwrite($this->socket, $this->encodeLength(strlen('.tag=' . $param2)) . '.tag=' . $param2 . chr(0));
-                $this->debug('<<< [' . strlen('.tag=' . $param2) . '] .tag=' . $param2);
+                fwrite($this->socket, $this->encodeLength(strlen('.tag='.$param2)).'.tag='.$param2.chr(0));
+                $this->debug('<<< ['.strlen('.tag='.$param2).'] .tag='.$param2);
             } elseif (gettype($param2) == 'boolean') {
                 fwrite($this->socket, ($param2 ? chr(0) : ''));
             }
@@ -456,9 +465,9 @@ class BaseRouterAPI
     /**
      * Write (send) data to Router OS
      *
-     * @param  string $com A string with the command to send
-     * @param  array  $arr An array with arguments or queries
-     * @return array  Array with parsed
+     * @param  string  $com  A string with the command to send
+     * @param  array  $arr  An array with arguments or queries
+     * @return array Array with parsed
      */
     public function comm($com, $arr = [])
     {
