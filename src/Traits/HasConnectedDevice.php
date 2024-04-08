@@ -146,7 +146,7 @@ trait HasConnectedDevice
 
                 foreach ($APIPriorityUser as $queue) {
                     // dd($queue);
-                    if ($queue['target'] == $device['address'] . '/24' || $queue['target'] == $device['address'] . '/32') {
+                    if ($queue['target'] == $device['address'].'/24' || $queue['target'] == $device['address'].'/32') {
                         $rate = explode('/', $queue['rate']);
                         $upload = $rate[0];
                         $download = $rate[1];

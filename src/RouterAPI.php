@@ -10,8 +10,8 @@ use HomeNet\RouterosApi\Traits\RebootAction;
 
 class RouterAPI
 {
-    use HasInterfaces;
     use HasConnectedDevice;
+    use HasInterfaces;
     use HasSavedDevice;
     use RebootAction;
 
