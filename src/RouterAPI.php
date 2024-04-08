@@ -3,11 +3,17 @@
 namespace HomeNet\RouterosApi;
 
 use Exception;
+use HomeNet\RouterosApi\Traits\HasConnectedDevice;
 use HomeNet\RouterosApi\Traits\HasInterfaces;
+use HomeNet\RouterosApi\Traits\HasSavedDevice;
+use HomeNet\RouterosApi\Traits\RebootAction;
 
 class RouterAPI
 {
     use HasInterfaces;
+    use HasConnectedDevice;
+    use HasSavedDevice;
+    use RebootAction;
 
     private $api;
 
