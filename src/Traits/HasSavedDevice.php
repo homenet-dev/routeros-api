@@ -90,7 +90,7 @@ trait HasSavedDevice
             if (isset($lease['comment'])) {
                 $commentLower = strtolower($lease['comment']);
                 if (strpos($commentLower, $inputLower) !== false) {
-                    return true; 
+                    return true;
                 }
             }
 

@@ -21,7 +21,8 @@ trait HasInterfaces
         return $monitoringtraffic;
     }
 
-    public function avgTrafficMonitor($interfacename, $duration) {
+    public function avgTrafficMonitor($interfacename, $duration)
+    {
 
         $trafficMonitor = $this->api->comm('/interface/monitor-traffic', [
             'interface' => $interfacename,
