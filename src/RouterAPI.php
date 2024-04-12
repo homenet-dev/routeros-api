@@ -11,16 +11,15 @@ use HomeNet\RouterosApi\Traits\HasSavedDevice;
 use HomeNet\RouterosApi\Traits\HasSystemResource;
 use HomeNet\RouterosApi\Traits\RebootAction;
 
-
 class RouterAPI
 {
     use HasConnectedDevice;
-    use HasInterfaces;
-    use HasSavedDevice;
-    use RebootAction;
     use HasHotspot;
-    use HasSystemResource;
+    use HasInterfaces;
     use HasPing;
+    use HasSavedDevice;
+    use HasSystemResource;
+    use RebootAction;
 
     private $api;
 

@@ -7,7 +7,7 @@ class UptimeHelper
     public static function convertUptime($uptimeString)
     {
         preg_match('/(\d+)w(\d+)d(\d+)h(\d+)m(\d+)s/', $uptimeString, $matches);
-        
+
         $weeks = $matches[1];
         $days = $matches[2];
         $hours = $matches[3];

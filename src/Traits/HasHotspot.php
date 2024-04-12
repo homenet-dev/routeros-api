@@ -3,8 +3,6 @@
 namespace HomeNet\RouterosApi\Traits;
 
 use Exception;
-use RouterOS\Client;
-use RouterOS\Query;
 
 trait HasHotspot
 {
@@ -12,6 +10,7 @@ trait HasHotspot
     {
         //print data hotspot keseluruhan
         $hotspots = $this->api->comm('/ip/hotspot/print');
+
         return $hotspots;
     }
 
@@ -37,6 +36,7 @@ trait HasHotspot
                 }
             }
         }
+
         return false;
     }
 
@@ -55,14 +55,16 @@ trait HasHotspot
         //ambil data hotspot dengan nama sesuai dan enable/disable iolation hotspot
         foreach ($hotspotsdataget as $value) {
             if ($value['name'] == 'hotspot-pembayaran') {
-                if ($value['disabled']  = $enabled ? 'false' : 'true') {
+                if ($value['disabled'] = $enabled ? 'false' : 'true') {
                     $this->api->comm('/ip/hotspot/set', $value);
+
                     return 'Berhasil mengubah status isolation';
                 } else {
                     return 'Gagal mengubah status isolation';
                 }
             }
         }
+
         return 'Tidak ditemukan data hotspot, Gagal mengubah status';
     }
 }
