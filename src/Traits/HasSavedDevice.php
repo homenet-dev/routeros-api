@@ -2,6 +2,8 @@
 
 namespace HomeNet\RouterosApi\Traits;
 
+use Exception;
+
 trait HasSavedDevice
 {
     public function savedDevices()
@@ -69,5 +71,36 @@ trait HasSavedDevice
             'messages' => 'success',
             'data' => ['list' => $saved],
         ];
+    }
+
+    public function isDeviceRegistered($input)
+    {
+        $inputLower = strtolower($input);
+        $data = [
+            '.proplist' => 'comment,host-name',
+        ];
+
+        $registerDeviceData = $this->api->comm('/ip/dhcp-server/lease/print', $data);
+
+        if (isset($registerDeviceData['!trap'])) {
+            throw new Exception('Gagal mengambil data registered device');
+        }
+
+        foreach ($registerDeviceData as $lease) {
+            if (isset($lease['comment'])) {
+                $commentLower = strtolower($lease['comment']);
+                if (strpos($commentLower, $inputLower) !== false) {
+                    return true; 
+                }
+            }
+
+            if (isset($lease['host-name'])) {
+                $hostNameLower = strtolower($lease['host-name']);
+                if (strpos($hostNameLower, $inputLower) !== false) {
+                    return true;
+                }
+            }
+        }
+        throw new Exception('Device tidak ditemukan');
     }
 }

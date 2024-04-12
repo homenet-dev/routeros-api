@@ -20,4 +20,34 @@ trait HasInterfaces
 
         return $monitoringtraffic;
     }
+
+    public function avgTrafficMonitor($interfacename, $duration) {
+
+        $trafficMonitor = $this->api->comm('/interface/monitor-traffic', [
+            'interface' => $interfacename,
+            'duration' => $duration,
+        ]);
+
+        $num = count($trafficMonitor);
+        $totalrxbits = 0;
+        $totaltxbits = 0;
+
+        for ($i = 0; $i < $num; $i++) {
+            $totalrxbits += (float) $trafficMonitor[$i]['rx-bits-per-second'];
+            $totaltxbits += (float) $trafficMonitor[$i]['tx-bits-per-second'];
+        }
+
+        if ($num > 0) {
+            $avgrx = $totalrxbits / $num;
+            $avgtx = $totaltxbits / $num;
+        } else {
+            $avgrx = null;
+            $avgtx = null;
+        }
+
+        return [
+            'rx' => $avgrx,
+            'tx' => $avgtx,
+        ];
+    }
 }
