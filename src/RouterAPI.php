@@ -4,9 +4,13 @@ namespace HomeNet\RouterosApi;
 
 use Exception;
 use HomeNet\RouterosApi\Traits\HasConnectedDevice;
+use HomeNet\RouterosApi\Traits\HasHotspot;
 use HomeNet\RouterosApi\Traits\HasInterfaces;
+use HomeNet\RouterosApi\Traits\HasPing;
 use HomeNet\RouterosApi\Traits\HasSavedDevice;
+use HomeNet\RouterosApi\Traits\HasSystemResource;
 use HomeNet\RouterosApi\Traits\RebootAction;
+
 
 class RouterAPI
 {
@@ -14,6 +18,9 @@ class RouterAPI
     use HasInterfaces;
     use HasSavedDevice;
     use RebootAction;
+    use HasHotspot;
+    use HasSystemResource;
+    use HasPing;
 
     private $api;
 

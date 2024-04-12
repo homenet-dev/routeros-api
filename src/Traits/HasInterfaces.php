@@ -10,4 +10,15 @@ trait HasInterfaces
 
         return $interfaces;
     }
+
+    public function trafficmonitor($interfacename, $duration)
+    {
+        $monitoringtraffic = $this->api->comm('/interface/monitor-traffic', [
+            'interface' => $interfacename,
+            'duration' => $duration
+        ]);
+
+        return $monitoringtraffic;
+    }
+
 }
