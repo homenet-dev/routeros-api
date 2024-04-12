@@ -1,8 +1,8 @@
 # RouterOS API
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/homenet/routeros-api.svg?style=flat-square)](https://packagist.org/packages/homenet/routeros-api)
-[![Tests](https://img.shields.io/github/actions/workflow/status/homenet/routeros-api/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/homenet/routeros-api/actions/workflows/run-tests.yml)
-[![Total Downloads](https://img.shields.io/packagist/dt/homenet/routeros-api.svg?style=flat-square)](https://packagist.org/packages/homenet/routeros-api)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/homenet.dev/routeros-api.svg?style=flat-square)](https://packagist.org/packages/homenet.dev/routeros-api)
+[![Tests](https://img.shields.io/github/actions/workflow/status/homenet.dev/routeros-api/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/homenet.dev/routeros-api/actions/workflows/run-tests.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/homenet.dev/routeros-api.svg?style=flat-square)](https://packagist.org/packages/homenet.dev/routeros-api)
 
 This is an Service for connecting to RouterOS API.
 
