@@ -11,7 +11,6 @@ trait HasConnectedDevice
         $data['?status'] = 'bound';
 
         $connectedLease = $this->api->comm('/ip/dhcp-server/lease/print', $data);
-        // dd($connectedLease);
 
         if (isset($connectedLease['!trap'])) {
             return [
@@ -64,7 +63,6 @@ trait HasConnectedDevice
             }
         }
 
-        //getting blocked user
         unset($data);
 
         $data = [];
@@ -76,7 +74,6 @@ trait HasConnectedDevice
 
         $blockedUser = [];
         foreach ($APIBlockedUser as $block) {
-            // dd($block);
             $macAddress = $block['src-mac-address'];
             if (in_array($macAddress, $chooseDataLease['mac-address'])) {
                 $block['device-name'] = $chooseDataLease['name'][array_search($macAddress, $chooseDataLease['mac-address'])];
@@ -140,7 +137,6 @@ trait HasConnectedDevice
 
                 $device['comment'] = $chooseDataLease['name'][array_search($macAddress, $chooseDataLease['mac-address'])];
                 $device['saved'] = $chooseDataLease['saved'][array_search($macAddress, $chooseDataLease['mac-address'])];
-                // dd($device);
 
                 $device['id_queue'] = null;
 

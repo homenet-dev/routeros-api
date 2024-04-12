@@ -33,6 +33,7 @@ trait HasPing
     }
 }
 
+// TODO: remove commented code
 // Ambil data uptime
 // $datauptime = [];
 // $datauptime['.proplist'] = 'uptime';
