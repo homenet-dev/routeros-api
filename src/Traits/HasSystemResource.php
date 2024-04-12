@@ -18,11 +18,6 @@ trait HasSystemResource
             throw new Exception('Gagal print data uptime!');
         }
 
-        // TODO: Lebih baik gunakan return $uptimep[0] saja
-        foreach ($uptime as $timedata) {
-            $uptimeString = $timedata['uptime'];
-
-            return $uptimeString;
-        }
+        return $uptime[0]['uptime'];
     }
 }
