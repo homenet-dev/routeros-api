@@ -21,7 +21,8 @@ trait HasInterfaces
         return $monitoringtraffic;
     }
 
-    public function avgTrafficMonitor($interfacename, $duration) {
+    public function avgTrafficMonitor($interfacename, $duration)
+    {
 
         $trafficMonitor = $this->api->comm('/interface/monitor-traffic', [
             'interface' => $interfacename,
@@ -32,6 +33,9 @@ trait HasInterfaces
         $totalrxbits = 0;
         $totaltxbits = 0;
 
+        $avgrx = 0;
+        $avgtx = 0;
+
         for ($i = 0; $i < $num; $i++) {
             $totalrxbits += (float) $trafficMonitor[$i]['rx-bits-per-second'];
             $totaltxbits += (float) $trafficMonitor[$i]['tx-bits-per-second'];
@@ -40,9 +44,6 @@ trait HasInterfaces
         if ($num > 0) {
             $avgrx = $totalrxbits / $num;
             $avgtx = $totaltxbits / $num;
-        } else {
-            $avgrx = null;
-            $avgtx = null;
         }
 
         return [
