@@ -6,7 +6,6 @@ use Exception;
 
 trait HasPriority
 {
-
     public function priorityPrint()
     {
         $datapriority = [];
@@ -17,6 +16,7 @@ trait HasPriority
         if (isset($lease['!trap'])) {
             throw new Exception('Gagal mendapatkan data queue');
         }
+
         return $lease;
     }
 
@@ -76,7 +76,7 @@ trait HasPriority
                     $this->api->comm('/queue/simple/set', [
                         '.id' => $value['.id'],
                         'name' => $device_name,
-                        'priority' => $value['priority']
+                        'priority' => $value['priority'],
                     ]);
                     $updated = true;
                 }
