@@ -7,6 +7,7 @@ use HomeNet\RouterosApi\Traits\HasConnectedDevice;
 use HomeNet\RouterosApi\Traits\HasHotspot;
 use HomeNet\RouterosApi\Traits\HasInterfaces;
 use HomeNet\RouterosApi\Traits\HasPing;
+use HomeNet\RouterosApi\Traits\HasPriority;
 use HomeNet\RouterosApi\Traits\HasSavedDevice;
 use HomeNet\RouterosApi\Traits\HasSystemResource;
 use HomeNet\RouterosApi\Traits\RebootAction;
@@ -17,9 +18,11 @@ class RouterAPI
     use HasHotspot;
     use HasInterfaces;
     use HasPing;
+    use HasPriority;
     use HasSavedDevice;
     use HasSystemResource;
     use RebootAction;
+
 
     private $api;
 
@@ -28,7 +31,7 @@ class RouterAPI
         $this->api = new BaseRouterAPI();
 
         $connect = $this->api->connect($host, $username, $password);
-        if (! $connect) {
+        if (!$connect) {
             throw new Exception("can't connect to host");
         }
     }

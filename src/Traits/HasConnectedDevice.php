@@ -32,7 +32,7 @@ trait HasConnectedDevice
             $chooseDataLease['mac-address'][] = $device['mac-address'];
 
             // getting device name from comment or hostname
-            if (! isset($device['comment'])) {
+            if (!isset($device['comment'])) {
                 $chooseDataLease['saved'][] = false;
                 if (isset($device['host-name'])) {
                     $chooseDataLease['name'][] = $device['host-name'];
@@ -45,7 +45,7 @@ trait HasConnectedDevice
                     $chooseDataLease['name'][] = $deviceName;
                     $chooseDataLease['saved'][] = true;
                 } else {
-                    if (! isset($device['host-name'])) {
+                    if (!isset($device['host-name'])) {
                         $device['host-name'] = $device['address'];
                         $chooseDataLease['name'][] = $device['host-name'];
                     } else {
@@ -142,7 +142,7 @@ trait HasConnectedDevice
 
                 foreach ($APIPriorityUser as $queue) {
                     // dd($queue);
-                    if ($queue['target'] == $device['address'].'/24' || $queue['target'] == $device['address'].'/32') {
+                    if ($queue['target'] == $device['address'] . '/24' || $queue['target'] == $device['address'] . '/32') {
                         $rate = explode('/', $queue['rate']);
                         $upload = $rate[0];
                         $download = $rate[1];
@@ -162,12 +162,12 @@ trait HasConnectedDevice
                     }
                 }
 
-                if (! isset($device['download'])) {
+                if (!isset($device['download'])) {
                     $device['download'] = '-';
                     $downloadUnit = '-';
                 }
 
-                if (! isset($device['upload'])) {
+                if (!isset($device['upload'])) {
                     $device['upload'] = '-';
                     $uploadUnit = '-';
                 }
@@ -189,3 +189,15 @@ trait HasConnectedDevice
         return $response;
     }
 }
+
+/*
+TODO : PRIORITY MODE, set priority to 5/5 (to get priority),
+6/6 to normal (smaller = more priority),
+set name to priority-jinom to priority,
+set jc to non priority/default
+path queue/simple/print
+
+Trait HasPriority
+
+str_replace to set name priority - jc
+*/
