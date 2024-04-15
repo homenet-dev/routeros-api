@@ -13,17 +13,14 @@ trait HasSavedDevice
         $commandData = [];
         $commandData['.proplist'] = '.id,target,name,rate';
         $commandData['?parent'] = 'saved-jinom';
-        $queue = $this->api->comm('/queue/simple/print', $commandData);
+        $queue = $this->comm('/queue/simple/print', $commandData);
         if (isset($queue['!trap'])) {
-            return [
-                'error' => true,
-                'messages' => 'Terjadi kesalahan RS-001',
-            ];
+            throw new Exception("Terjadi kesalahan RS-001");
         }
 
         // get data leases
         $data['.proplist'] = '.id,address,mac-address,host-name,comment';
-        $lease = $this->api->comm('/ip/dhcp-server/lease/print', $data);
+        $lease = $this->comm('/ip/dhcp-server/lease/print', $data);
         if (isset($lease['!trap'])) {
             return [
                 'error' => true,
@@ -66,11 +63,7 @@ trait HasSavedDevice
             // }
         }
 
-        return [
-            'error' => false,
-            'messages' => 'success',
-            'data' => ['list' => $saved],
-        ];
+        return $saved;
     }
 
     public function isDeviceRegistered($deviceName)
@@ -80,7 +73,7 @@ trait HasSavedDevice
             '.proplist' => 'comment,host-name',
         ];
 
-        $registerDeviceData = $this->api->comm('/ip/dhcp-server/lease/print', $data);
+        $registerDeviceData = $this->comm('/ip/dhcp-server/lease/print', $data);
 
         if (isset($registerDeviceData['!trap'])) {
             throw new Exception('Gagal mengambil data registered device');
@@ -101,6 +94,253 @@ trait HasSavedDevice
                 }
             }
         }
+
         throw new Exception('Device tidak ditemukan');
+    }
+
+    public function registerDevice(
+        string $idLease,
+        string $deviceName,
+        string $bandwidth = '25M'
+    ) {
+        $queue = $this->comm("/queue/simple/print", ["?name" => "jc-$deviceName"]);
+
+        if (count($queue) > 0) {
+            throw new Exception("Nama sudah terdaftar. Mohon masukkan nama lain");
+        } else {
+
+            $leases = $this->comm("/ip/dhcp-server/lease/print", [
+                "?.id" => $idLease
+            ]);
+
+            if (array_key_exists("!trap", $leases)) {
+                $response["error"]      = true;
+                $response["messages"]    = $leases['!trap'][0]['message'];
+            } else {
+                if (count($leases) > 0) {
+                    $deviceAddress = $leases[0]['address'];
+                    $ipAddress = $deviceAddress;
+                    unset($commandData);
+                    $commandData = array();
+                    $commandData[".id"] = $idLease;
+
+                    $APIMakeStatic   = $this->comm("/ip/dhcp-server/lease/make-static", $commandData);
+
+                    if (array_key_exists("!trap", $APIMakeStatic)) {
+                        throw new Exception($APIMakeStatic['!trap'][0]['message']);
+                    } else {
+
+                        // make new
+                        unset($commandData);
+                        $commandData[".proplist"]   = "address";
+                        $commandData["?.id"]        = $idLease;
+
+
+                        unset($commandData);
+                        $commandData = array();
+                        $commandData["comment"] = 'jc-' . $deviceName;
+                        $commandData["address"] = $ipAddress;
+                        $commandData[".id"]     = $idLease;
+
+                        $APISetComment  = $this->comm("/ip/dhcp-server/lease/set", $commandData);
+
+                        if (array_key_exists("!trap", $APISetComment)) {
+                            throw new Exception($APISetComment['!trap'][0]['message']);
+                        } else {
+                            $ipAddressFix = $ipAddress . "/32";
+
+                            unset($commandData);
+                            $commandData["?target"]     = $ipAddressFix;
+                            $commandData["count-only"]  = "";
+
+                            $deviceQueue   = $this->comm("/queue/simple/print", $commandData);
+                            if ($deviceQueue < 1) {
+                                // create new simple queue
+                                unset($commandData);
+                                $commandData["name"]        = "jc-$deviceName";
+                                $commandData["target"]      = $ipAddress;
+                                $commandData["parent"]      = 'saved-jinom';
+                                $commandData["packet-marks"]      = "others-jinom-packet";
+                                $commandData["max-limit"]   = "$bandwidth/$bandwidth";
+                                $commandData["priority"]    = "6/6";
+                                $APIAddQueue   = $this->comm("/queue/simple/add", $commandData);
+                                if (isset($APIAddQueue['!trap'])) {
+                                    throw new Exception($APIAddQueue['!trap'][0]['message']);
+                                }
+                            } else {
+                                // update simple queue
+                                unset($commandData);
+                                $commandData[".proplist"]   = ".id,name";
+                                $commandData["?target"]     = $ipAddressFix;
+
+                                $deviceQueue    = $this->comm("/queue/simple/print", $commandData);
+                                $deviceQueue    = $deviceQueue[0];
+
+                                $queueId        = $deviceQueue['.id'];
+                                $oldDevicename = $deviceQueue['name'];
+
+                                if (strpos($oldDevicename, "priority-jinom") !== false) {
+                                    $newDeviceName  = "priority-jinom-" . $deviceName;
+                                    $priority       = "5/5";
+                                } else {
+                                    $newDeviceName = "jc-$deviceName";
+                                    $priority       = "6/6";
+                                }
+
+                                unset($commandData);
+                                $commandData["name"]        = $newDeviceName;
+                                $commandData["target"]      = $ipAddress;
+                                $commandData["parent"]      = 'saved-jinom';
+                                $commandData["packet-marks"]      = "others-jinom-packet";
+                                $commandData["max-limit"]   = "$bandwidth/$bandwidth";
+                                $commandData["priority"]    = $priority;
+                                $commandData[".id"]         = $queueId;
+
+                                $APISetQueue   = $this->comm("/queue/simple/set", $commandData);
+                                if (array_key_exists("!trap", $APISetQueue)) {
+                                    throw new Exception($APISetQueue['!trap'][0]['message']);
+                                }
+                            }
+                        }
+                        $this->reOrderSimpleQueue();
+
+                        //create dns filtering for device
+
+                        $commandData = array();
+                        $commandData[".proplist"]   = ".id,address,list";
+                        $commandData["?disabled"]   = "false";
+                        $APIAddressList  = $this->comm("/ip/firewall/address-list/print", $commandData);
+
+                        $addressList = array();
+                        $addressList['id'] = array();
+                        $addressList['list'] = array();
+                        $addressList['address'] = array();
+
+                        foreach ($APIAddressList as $address) {
+                            if (substr($address['list'], 0, 3) == "jc-") {
+                                $addressList['id'][]        = $address['.id'];
+                                $addressList['list'][]      = $address['list'];
+                                $addressList['address'][]   = $address['address'];
+                            }
+                        }
+
+                        // get all dns filter nat setting
+                        unset($commandData);
+                        $commandData = array();
+                        $commandData[".proplist"]   = "comment";
+                        // $commandData["?disabled"]   = "false";
+                        $APINatList  = $this->comm("/ip/firewall/nat/print", $commandData);
+
+                        $jinomDNSList = array();
+                        foreach ($APINatList as $nat) {
+                            if (isset($nat['comment'])) {
+                                $natName = $nat['comment'];
+                                if (substr($natName, 0, 3) == "jc-" && (strpos($natName, "-dns-") !== false)) {
+                                    $jinomDNSList[] = $natName;
+                                }
+                            }
+                        }
+
+                        // prepare variabel for setting dns filter
+                        $dnsFilterName  = "jc-low-dns";
+                        $port = "531";
+
+                        // check if device is on address list
+                        if (in_array($ipAddress, $addressList['address'])) {
+                            // update DNS Level
+                            $dnsFilterIndex = array_search($ipAddress, $addressList['address']);
+                            if ($dnsFilterIndex !== false) {
+                                if ($dnsFilterName != $addressList['list'][$dnsFilterIndex]) {
+
+                                    $id = $addressList['id'][$dnsFilterIndex];
+
+                                    unset($commandData);
+                                    $commandData = array();
+                                    $commandData["list"]    = $dnsFilterName;
+                                    $commandData["numbers"] = $id;
+                                    $APIAddressList  = $this->comm("/ip/firewall/address-list/set", $commandData);
+                                }
+                            }
+                        } else {
+                            // add DNS Level
+                            unset($commandData);
+                            $commandData = array();
+                            $commandData["list"]        = $dnsFilterName;
+                            $commandData["address"]     = $ipAddress;
+                            $commandData["disabled"]    = "no";
+                            $APIAddressList  = $this->comm("/ip/firewall/address-list/add", $commandData);
+                        }
+
+
+                        $dnsFilterNameSG = $dnsFilterName . "-sg";
+                        $dnsFilterNameID = $dnsFilterName . "-id";
+
+                        // if (!in_array($dnsFilterNameSG, $jinomDNSList)) {
+                        //     unset($commandData);
+                        //     $commandData = array();
+                        //     $commandData["chain"]               = "dstnat";
+                        //     $commandData["protocol"]            = "udp";
+                        //     $commandData["dst-port"]            = "53";
+                        //     $commandData["src-address-list"]    = $dnsFilterName;
+                        //     $commandData["action"]              = "dst-nat";
+                        //     $commandData["to-addresses"]        = "167.71.194.55";
+                        //     $commandData["to-ports"]            = $port;
+                        //     $commandData["disabled"]            = "yes";
+                        //     $commandData["comment"]             = $dnsFilterNameSG;
+                        //     $APIAddressList  = $this->comm("/ip/firewall/nat/add", $commandData);
+                        // }
+
+                        if (!in_array($dnsFilterNameID, $jinomDNSList)) {
+                            unset($commandData);
+                            $commandData = array();
+                            $commandData["chain"]               = "dstnat";
+                            $commandData["protocol"]            = "udp";
+                            $commandData["dst-port"]            = "53";
+                            $commandData["src-address-list"]    = $dnsFilterName;
+                            $commandData["action"]              = "dst-nat";
+                            $commandData["to-addresses"]        = "103.122.65.37";
+                            $commandData["to-ports"]            = $port;
+                            $commandData["disabled"]            = "no";
+                            $commandData["comment"]             = $dnsFilterNameID;
+                            $APIAddressList  = $this->comm("/ip/firewall/nat/add", $commandData);
+                        }
+                    }
+                } else {
+                    throw new Exception('Device tidak ditemukan');
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Fungsi untuk mengurutkan simple queue
+     *
+     * @return void
+     */
+    public function reOrderSimpleQueue(): void
+    {
+        $allSimpleQueue = $this->api->comm("/queue/simple/print");
+        // dd($allSimpleQueue);
+        foreach ($allSimpleQueue as $key => $lease) {
+            if (substr($lease['name'], 0, 3) == "jc-" || substr($lease['name'], 0, 15) == "priority-jinom-") {
+                unset($commandData);
+                $commandData['numbers'] = $lease[".id"];
+                $commandData['destination'] = $allSimpleQueue[0]['.id'];
+                $this->api->comm("/queue/simple/move", $commandData);
+            }
+        }
+
+        $allSimpleQueue = $this->api->comm("/queue/simple/print");
+
+        foreach ($allSimpleQueue as $key => $lease) {
+            if ($lease['name'] == 'saved-jinom') {
+                unset($commandData);
+                $commandData['numbers'] = $lease[".id"];
+                $commandData['destination'] = $allSimpleQueue[0]['.id'];
+                $this->api->comm("/queue/simple/move", $commandData);
+            }
+        }
     }
 }
