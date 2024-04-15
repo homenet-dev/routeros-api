@@ -23,7 +23,6 @@ class RouterAPI
     use HasSystemResource;
     use RebootAction;
 
-
     private $api;
 
     public function __construct(string $host, string $username, string $password)
@@ -31,7 +30,7 @@ class RouterAPI
         $this->api = new BaseRouterAPI();
 
         $connect = $this->api->connect($host, $username, $password);
-        if (!$connect) {
+        if (! $connect) {
             throw new Exception("can't connect to host");
         }
     }
