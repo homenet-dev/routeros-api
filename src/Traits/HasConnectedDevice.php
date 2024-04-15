@@ -10,7 +10,7 @@ trait HasConnectedDevice
         $data['.proplist'] = '.id,address,mac-address,status,host-name,comment';
         $data['?status'] = 'bound';
 
-        $connectedLease = $this->api->comm('/ip/dhcp-server/lease/print', $data);
+        $connectedLease = $this->comm('/ip/dhcp-server/lease/print', $data);
 
         if (isset($connectedLease['!trap'])) {
             return [
@@ -70,7 +70,7 @@ trait HasConnectedDevice
         $data['?comment'] = 'jinom-block-user';
         $data['?disabled'] = 'false';
 
-        $APIBlockedUser = $this->api->comm('/ip/firewall/filter/print', $data);
+        $APIBlockedUser = $this->comm('/ip/firewall/filter/print', $data);
 
         $blockedUser = [];
         foreach ($APIBlockedUser as $block) {
@@ -94,7 +94,7 @@ trait HasConnectedDevice
         $data = [];
         $data['.proplist'] = '.id,target,name,rate';
         $data['?parent'] = 'saved-jinom';
-        $APIPriorityUser = $this->api->comm('/queue/simple/print', $data);
+        $APIPriorityUser = $this->comm('/queue/simple/print', $data);
 
         if (isset($APIPriorityUser['!trap'])) {
             return [
@@ -104,7 +104,7 @@ trait HasConnectedDevice
         }
 
         $data2['?complete'] = 'yes';
-        $arp = $this->api->comm('/ip/arp/print', $data2);
+        $arp = $this->comm('/ip/arp/print', $data2);
         // dd($arp);
         if (isset($arp['!trap'])) {
             return [

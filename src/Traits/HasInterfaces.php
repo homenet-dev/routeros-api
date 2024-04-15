@@ -6,26 +6,26 @@ trait HasInterfaces
 {
     public function interfaces()
     {
-        $interfaces = $this->api->comm('/interface/print');
+        $interfaces = $this->comm('/interface/print');
 
         return $interfaces;
     }
 
-    public function trafficmonitor($interfacename, $duration)
+    public function trafficmonitor($interfaceName, $duration)
     {
-        $monitoringtraffic = $this->api->comm('/interface/monitor-traffic', [
-            'interface' => $interfacename,
+        $monitoringtraffic = $this->comm('/interface/monitor-traffic', [
+            'interface' => $interfaceName,
             'duration' => $duration,
         ]);
 
         return $monitoringtraffic;
     }
 
-    public function avgTrafficMonitor($interfacename, $duration)
+    public function avgTrafficMonitor($interfaceName, $duration)
     {
 
-        $trafficMonitor = $this->api->comm('/interface/monitor-traffic', [
-            'interface' => $interfacename,
+        $trafficMonitor = $this->comm('/interface/monitor-traffic', [
+            'interface' => $interfaceName,
             'duration' => $duration,
         ]);
 

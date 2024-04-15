@@ -8,7 +8,7 @@ trait HasPing
 {
     public function ping($host, $count)
     {
-        $ping = $this->api->comm('/ping', [
+        $ping = $this->comm('/ping', [
             'address' => "$host",
             'count' => "$count",
         ]);

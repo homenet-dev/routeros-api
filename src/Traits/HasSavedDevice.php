@@ -73,9 +73,9 @@ trait HasSavedDevice
         ];
     }
 
-    public function isDeviceRegistered($input)
+    public function isDeviceRegistered($deviceName)
     {
-        $inputLower = strtolower($input);
+        $inputLower = strtolower($deviceName);
         $data = [
             '.proplist' => 'comment,host-name',
         ];

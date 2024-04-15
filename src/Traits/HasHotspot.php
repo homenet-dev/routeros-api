@@ -9,7 +9,7 @@ trait HasHotspot
     public function hotspotServers()
     {
         //print data hotspot keseluruhan
-        $hotspots = $this->api->comm('/ip/hotspot/print');
+        $hotspots = $this->comm('/ip/hotspot/print');
 
         return $hotspots;
     }
@@ -20,7 +20,7 @@ trait HasHotspot
         $data['.proplist'] = '.id,name,disabled';
 
         //print data hotspot
-        $hotspotsApi = $this->api->comm('/ip/hotspot/print', $data);
+        $hotspotsApi = $this->comm('/ip/hotspot/print', $data);
         if (isset($hotspotApi['!trap'])) {
             throw new Exception('Gagal print hotspot server');
         }
@@ -46,7 +46,7 @@ trait HasHotspot
         $hotspotdata['.proplist'] = '.id,name,disabled';
 
         //print data hotspot
-        $hotspotsdataget = $this->api->comm('/ip/hotspot/print', $hotspotdata);
+        $hotspotsdataget = $this->comm('/ip/hotspot/print', $hotspotdata);
         if (isset($hotspotsdataget['!trap'])) {
             throw new Exception('Gagal print data hotspot');
         }
@@ -56,7 +56,7 @@ trait HasHotspot
         foreach ($hotspotsdataget as $value) {
             if ($value['name'] == 'hotspot-pembayaran') {
                 if ($value['disabled'] = $enabled ? 'false' : 'true') {
-                    $this->api->comm('/ip/hotspot/set', $value);
+                    $this->comm('/ip/hotspot/set', $value);
 
                     return 'Berhasil mengubah status isolation';
                 } else {

@@ -12,7 +12,7 @@ trait HasPriority
         $datapriority = [];
         $datapriority['.proplist'] = '.id,name,priority,target';
 
-        $lease = $this->api->comm('/queue/simple/print', $datapriority);
+        $lease = $this->comm('/queue/simple/print', $datapriority);
 
         if (isset($lease['!trap'])) {
             throw new Exception('Gagal mendapatkan data queue');
@@ -25,7 +25,7 @@ trait HasPriority
         $datapriority = [];
         $datapriority['.proplist'] = '.id,name,priority,target';
 
-        $lease = $this->api->comm('/queue/simple/print', $datapriority);
+        $lease = $this->comm('/queue/simple/print', $datapriority);
 
         if (isset($lease['!trap'])) {
             throw new Exception('Gagal mendapatkan data queue');
@@ -38,7 +38,7 @@ trait HasPriority
                 if (strpos($value['name'], 'jc-') === 0) {
                     $device_name = str_replace('jc-', 'priority-jinom-', $value['name']);
                     $value['priority'] = '5/5';
-                    $this->api->comm('/queue/simple/set', [
+                    $this->comm('/queue/simple/set', [
                         '.id' => $value['.id'],
                         'name' => $device_name,
                         'priority' => $value['priority'],
@@ -59,7 +59,7 @@ trait HasPriority
         $dataunpriority = [];
         $dataunpriority['.proplist'] = '.id,name,priority,target';
 
-        $leases = $this->api->comm('/queue/simple/print', $dataunpriority);
+        $leases = $this->comm('/queue/simple/print', $dataunpriority);
 
         if (isset($leases['!trap'])) {
             throw new Exception('Gagal mendapatkan data queue');
@@ -73,7 +73,7 @@ trait HasPriority
                     $device_name = str_replace('priority-jinom-', 'jc-', $value['name']);
                     $value['priority'] = '6/6';
 
-                    $this->api->comm('/queue/simple/set', [
+                    $this->comm('/queue/simple/set', [
                         '.id' => $value['.id'],
                         'name' => $device_name,
                         'priority' => $value['priority']

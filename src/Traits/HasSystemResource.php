@@ -13,7 +13,7 @@ trait HasSystemResource
         $datauptime['.proplist'] = 'uptime';
 
         // Print exception jika error
-        $uptime = $this->api->comm('/system/resource/print', $datauptime);
+        $uptime = $this->comm('/system/resource/print', $datauptime);
         if (isset($uptime['!trap'])) {
             throw new Exception('Gagal print data uptime!');
         }
