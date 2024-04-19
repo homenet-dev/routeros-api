@@ -24,7 +24,6 @@ trait HasHotspot
         if (isset($hotspotApi['!trap'])) {
             throw new Exception('Gagal print hotspot server');
         }
-        // $hotspotsApi = [];
 
         //cek ambil data hotspot sesuai nama dan status disable
         foreach ($hotspotsApi as $value) {
@@ -50,7 +49,6 @@ trait HasHotspot
         if (isset($hotspotsdataget['!trap'])) {
             throw new Exception('Gagal print data hotspot');
         }
-        // $hotspotsdataget = [];
 
         //ambil data hotspot dengan nama sesuai dan enable/disable iolation hotspot
         foreach ($hotspotsdataget as $value) {

@@ -141,7 +141,6 @@ trait HasConnectedDevice
                 $device['id_queue'] = null;
 
                 foreach ($APIPriorityUser as $queue) {
-                    // dd($queue);
                     if ($queue['target'] == $device['address'].'/24' || $queue['target'] == $device['address'].'/32') {
                         $rate = explode('/', $queue['rate']);
                         $upload = $rate[0];
@@ -149,7 +148,6 @@ trait HasConnectedDevice
 
                         $upload = (float) $upload / 1000000;
                         $download = (float) $download / 1000000;
-                        // dd($upload);
 
                         $upload = number_format($upload, 2);
                         $download = number_format($download, 2);
@@ -189,15 +187,3 @@ trait HasConnectedDevice
         return $response;
     }
 }
-
-/*
-TODO : PRIORITY MODE, set priority to 5/5 (to get priority),
-6/6 to normal (smaller = more priority),
-set name to priority-jinom to priority,
-set jc to non priority/default
-path queue/simple/print
-
-Trait HasPriority
-
-str_replace to set name priority - jc
-*/
