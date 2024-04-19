@@ -8,7 +8,7 @@ use HomeNet\RouterosApi\Traits\HasHotspot;
 use HomeNet\RouterosApi\Traits\HasInterfaces;
 use HomeNet\RouterosApi\Traits\HasPing;
 use HomeNet\RouterosApi\Traits\HasPriority;
-use HomeNet\RouterosApi\Traits\HasSavedDevice;
+use HomeNet\RouterosApi\Traits\HasRegisterDevice;
 use HomeNet\RouterosApi\Traits\HasSystemResource;
 use HomeNet\RouterosApi\Traits\RebootAction;
 
@@ -19,7 +19,7 @@ class RouterAPI
     use HasInterfaces;
     use HasPing;
     use HasPriority;
-    use HasSavedDevice;
+    use HasRegisterDevice;
     use HasSystemResource;
     use RebootAction;
 

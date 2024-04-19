@@ -4,9 +4,9 @@ namespace HomeNet\RouterosApi\Traits;
 
 use Exception;
 
-trait HasSavedDevice
+trait HasRegisterDevice
 {
-    public function savedDevices()
+    public function registeredDevice()
     {
         $saved = [];
 

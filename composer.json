@@ -25,11 +25,7 @@
     "autoload": {
         "psr-4": {
             "HomeNet\\RouterosApi\\": "src"
-        },
-
-        "files": [
-            "helper/UptimeHelper.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
